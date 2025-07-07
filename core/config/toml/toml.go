@@ -15,10 +15,10 @@
 package toml
 
 import (
+	"github.com/beego/beego/v2/core/utils"
+	"github.com/pelletier/go-toml"
 	"os"
 	"strings"
-
-	"github.com/pelletier/go-toml"
 
 	"github.com/beego/beego/v2/core/config"
 )
@@ -307,7 +307,7 @@ func (c *configContainer) OnChange(key string, fn func(value string)) {
 // SaveConfigFile create or override the file
 func (c *configContainer) SaveConfigFile(filename string) error {
 	// Write configuration file by filename.
-	f, err := os.Create(filename)
+	f, err := utils.OpenFileSecure(filename, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}

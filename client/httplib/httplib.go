@@ -36,6 +36,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"encoding/xml"
+	"github.com/beego/beego/v2/core/utils"
 	"io"
 	"mime/multipart"
 	"net"
@@ -615,7 +616,7 @@ func (b *BeegoHTTPRequest) ToFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	f, err := os.Create(filename)
+	f, err := utils.OpenFileSecure(filename, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
