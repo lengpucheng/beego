@@ -18,9 +18,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/fs"
 	"net/http"
 	"strconv"
 	"text/template"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -34,6 +37,49 @@ type adminController struct {
 
 func (a *adminController) registerHttpServer(svr *HttpServer) {
 	a.servers = append(a.servers, svr)
+}
+
+// Static is the http.Handler for serving embedded static assets (JS, CSS, etc.).
+// It is registered with url pattern "/static/*" in admin module.
+// This is used to serve frontend dependencies like bootstrap, jQuery, etc. without relying on external CDN.
+func (a *adminController) Static() {
+	path := a.Ctx.Input.Param(":splat") // matches everything after /static/
+
+	if path == "" || path == "/" {
+		a.Ctx.Output.SetStatus(404)
+		a.Ctx.Output.Body([]byte("404 - File Not Found"))
+		return
+	}
+
+	f, err := adminUIStaticFs.Open(fmt.Sprintf("static/%s", path))
+	if err != nil {
+		a.Ctx.Output.SetStatus(404)
+		a.Ctx.Output.Body([]byte("404 - File Not Found"))
+		return
+	}
+	defer f.Close()
+
+	// read file content
+	data, err := io.ReadAll(f)
+	if err != nil {
+		a.Ctx.Output.SetStatus(500)
+		a.Ctx.Output.Body([]byte("500 - Failed to read file"))
+		return
+	}
+	modTime := getModTime(f)
+	reader := bytes.NewReader(data)
+
+	http.ServeContent(a.Ctx.ResponseWriter, a.Ctx.Request, path, modTime, reader)
+}
+
+// getModTime extracts the modification time from an fs.File for use in http.ServeContent.
+// If retrieval fails, it returns current time to avoid runtime errors.
+func getModTime(f fs.File) time.Time {
+	info, err := f.Stat()
+	if err != nil {
+		return time.Now()
+	}
+	return info.ModTime()
 }
 
 // ProfIndex is a http.Handler for showing profile command.

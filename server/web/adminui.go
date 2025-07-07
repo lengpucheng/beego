@@ -14,6 +14,11 @@
 
 package web
 
+import "embed"
+
+//go:embed static/*
+var adminUIStaticFs embed.FS
+
 var indexTpl = `
 {{define "content"}}
 <h1>Beego Admin Dashboard</h1>
@@ -253,8 +258,8 @@ Welcome to Beego Admin Dashboard
 
 </title>
 
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-<link href="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/css/dataTables.bootstrap.css" rel="stylesheet">
 
 <style type="text/css">
 ul.nav li.dropdown:hover > ul.dropdown-menu {
@@ -339,10 +344,10 @@ Healthcheck
 {{template "content" .}}
 </div>
 
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script src="//cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js
+<script src="/static/js/jquery-1.11.1.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/dataTables.bootstrap.js
 "></script>
 
 <script type="text/javascript">

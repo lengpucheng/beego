@@ -116,7 +116,7 @@ func registerAdmin() error {
 		beeAdminApp.Router("/task", c, "get:TaskStatus")
 		beeAdminApp.Router("/listconf", c, "get:ListConf")
 		beeAdminApp.Router("/metrics", c, "get:PrometheusMetrics")
-
+		beeAdminApp.Router("/static/*", c, "get:Static")
 		go beeAdminApp.Run()
 	}
 	return nil
